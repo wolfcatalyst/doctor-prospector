@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "doctor-prospector-backend"
+version = "1.0.0"
+description = "Doctor Prospector - FastAPI backend for healthcare provider intelligence"
+requires-python = ">=3.11"
+license = "Elastic-2.0"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "sqlalchemy[asyncio]>=2.0.35",
+    "asyncpg>=0.30.0",
+    "alembic>=1.14.0",
+    "pydantic[email]>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    "passlib[bcrypt]>=1.7.4",
+    "python-jose[cryptography]>=3.3.0",
+    "redis>=5.2.0",
+    "httpx>=0.27.0",
+    "requests>=2.31.0",
+    "python-multipart>=0.0.12",
+    # Shared core library deps (also in root pyproject.toml)
+    "beautifulsoup4>=4.12.0",
+    "pandas>=2.2.0",
+    "openpyxl>=3.1.0",
+    "lxml>=5.1.0",
+    "aiosqlite>=0.20.0",
+    "pyyaml>=6.0.0",
+    "rich>=13.7.0",
+    # scripts/import_puf.py (history import; the scheduler reads its year list)
+    "psycopg2-binary>=2.9.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+    "httpx>=0.27.0",
+    "respx>=0.21.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]

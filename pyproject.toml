@@ -1,0 +1,66 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "doctor-prospector"
+version = "1.0.0"
+description = "Automated prospect list generator for TAVR medical device sales"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Elastic-2.0"
+authors = [
+    { name = "Wolf" }
+]
+dependencies = [
+    "httpx>=0.27.0",
+    "requests>=2.31.0",
+    "beautifulsoup4>=4.12.0",
+    "pandas>=2.2.0",
+    "openpyxl>=3.1.0",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    "typer>=0.12.0",
+    "rich>=13.7.0",
+    "lxml>=5.1.0",
+    "aiosqlite>=0.20.0",
+    "pyyaml>=6.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.3.0",
+    "mypy>=1.8.0",
+    "respx>=0.21.0",  # Mock httpx requests
+]
+scraping = [
+    "playwright>=1.42.0",  # If JS rendering needed
+]
+
+[project.scripts]
+doctor-prospector = "doctor_prospector.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/doctor_prospector"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM"]
+ignore = ["E501"]  # Line length handled by formatter
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_ignores = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "backend"]
+asyncio_mode = "auto"

@@ -1,0 +1,34 @@
+# Dev overrides: hot reload, source mounts, debug mode
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      - DEBUG=true
+      - AUTH_ENABLED=false
+    volumes:
+      - ../backend/app:/app/backend/app
+      - ../src:/app/src
+      - source_cache:/app/data/cache
+      - export_files:/app/data/exports
+      - ../data/cms_historical:/app/data/cms_historical:ro
+      - ../config.yaml:/app/config.yaml:ro
+      - ../data/output:/app/data/output:ro
+
+  # In dev, run frontend with Vite dev server instead of nginx
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    # Override to use Vite dev server
+    # For actual dev, run `npm run dev` locally with proxy instead
+    ports:
+      - "3000:80"
+
+volumes:
+  source_cache:
+  export_files:

@@ -1,0 +1,205 @@
+# Doctor Prospector - app configuration
+# All data sources are modular plugins - enable/disable here.
+#
+# This file controls WHAT the app does (sources, scoring, manual hospitals,
+# cache). HOW it runs (database, Redis, login, port) is set elsewhere:
+#   - Standalone install: .env in this folder (see .env.example)
+#       DATABASE_URL  SQLite file by default; PostgreSQL optional
+#       REDIS_URL     optional; empty = in-memory logout list
+#       AUTH_ENABLED, SECRET_KEY, HOST, PORT
+#   - Docker: docker/.env (see docker/.env.example) - PostgreSQL + Redis
+
+sources:
+  tvt_registry:
+    enabled: true
+    cache_ttl_hours: 168  # Weekly - TVT updates quarterly
+    base_url: "https://tvtpublicreporting.sts.org/tvt-registry"
+    
+  cms_utilization:
+    enabled: true
+    cache_ttl_hours: 720  # Monthly - CMS updates annually
+    cpt_codes:
+      - "33361"  # TAVR, percutaneous femoral artery approach
+      - "33362"  # TAVR, open femoral artery approach
+      - "33363"  # TAVR, percutaneous axillary artery approach
+      - "33364"  # TAVR, open axillary artery approach
+      - "33365"  # TAVR, transaortic approach
+      - "33366"  # TAVR, transapical approach
+      - "33367"  # TAVR, cardiopulmonary bypass support
+      - "33368"  # TAVR, percutaneous transcaval approach
+      - "33369"  # TAVR, other approaches
+    
+  nppes:
+    enabled: true
+    cache_ttl_hours: 24  # Daily - real-time API
+    base_url: "https://npiregistry.cms.hhs.gov/api/"
+    api_version: "2.1"
+    rate_limit_per_minute: 100
+    taxonomies:
+      - "Interventional Cardiology"
+      - "Thoracic Surgery (Cardiothoracic Vascular Surgery)"
+      - "Adult Congenital Heart Disease"
+    
+  open_payments:
+    enabled: true
+    cache_ttl_hours: 720  # Monthly - CMS updates annually
+    base_url: "https://openpaymentsdata.cms.gov/api/1/datastore/query"
+    manufacturers:
+      - "Edwards Lifesciences"
+      - "Medtronic"
+      - "Abbott"
+      - "Boston Scientific"
+      # Add your own company to see which physicians already work with you
+
+  cms_pos:
+    enabled: true
+    cache_ttl_hours: 720  # Monthly - POS updates quarterly
+    base_url: "https://data.cms.gov/data-api/v1/dataset/8ba0f9b4-9493-4aa0-9f82-44ea9468d1b5/data"
+    page_size: 5000
+
+  edwards_connect:
+    enabled: true
+    cache_ttl_hours: 168  # Weekly - Edwards directory changes infrequently
+    api_url: "https://edwardsconnect.com/api/thv/fath"
+    search_url: "https://treatheartvalvefailure.com/find-a-tavr-hospital"
+
+  cms_drg:
+    enabled: true
+    cache_ttl_hours: 720  # Monthly - CMS inpatient data updates annually
+    base_url: "https://data.cms.gov/data-api/v1/dataset/690ddc6c-2767-4618-b277-420ffb2bf27c/data"
+    page_size: 5000
+
+  cms_hospital_compare:
+    enabled: true
+    cache_ttl_hours: 720  # Monthly - Hospital Compare updates annually
+    dataset_id: "xubh-q36u"
+
+  clinical_trials:
+    enabled: true
+    cache_ttl_hours: 24  # Daily - real-time API
+    base_url: "https://clinicaltrials.gov/api/v2/studies"
+    search_terms:
+      - "TAVR"
+      - "TAVI"
+      - "transcatheter aortic valve replacement"
+      - "transcatheter aortic valve implantation"
+    statuses:
+      - "RECRUITING"
+      - "ACTIVE_NOT_RECRUITING"
+      - "ENROLLING_BY_INVITATION"
+
+# Your own contacts: physicians you already have a relationship with.
+# Keep this private; it isn't used for scoring yet. Example:
+#   physicians:
+#     - npi: "1234567890"
+#       name: "Jane Example, MD"
+#       institution: "Example Medical Center"
+#       relationship: "Met at a conference"
+#       notes: "Interested in a demo"
+warm_leads:
+  physicians: []
+
+# Hospitals not in TVT Registry but confirmed active via CMS billing data
+# (Hospital discovery finds these automatically from CMS billing data; add one
+# here only if it's missing. Example:)
+#   - name: "Example Medical Center"
+#     city: "Springfield"
+#     state: "IL"
+#     address: "1 Main St"
+#     zip: "62701"
+#     annual_tavr_volume: 100
+#     notes: "Why it's here"
+manual_hospitals: []
+
+# Scoring algorithm configuration
+scoring:
+  # Hospital factors (50 points max)
+  hospital:
+    volume:
+      high_threshold: 200
+      high_points: 20
+      medium_threshold: 100
+      medium_points: 15
+      low_threshold: 50
+      low_points: 10
+      minimum_points: 5
+      
+    star_rating:
+      three_star_points: 15
+      two_star_points: 10
+      one_star_points: 5
+      no_rating_points: 0
+      
+    program_age:
+      new_threshold_years: 3
+      new_points: 15
+      established_threshold_years: 5
+      established_points: 10
+      mature_points: 5
+      unknown_points: 5
+
+  # Physician factors (50 points max)
+  physician:
+    trial_activity:
+      pi_points: 20
+      investigator_points: 15
+      none_points: 0
+      
+    volume:
+      high_threshold: 100
+      high_points: 15
+      medium_threshold: 50
+      medium_points: 10
+      low_points: 5
+      unknown_points: 5
+      
+    device_payments:
+      # Lower payments = MORE points (less entrenched)
+      low_threshold: 10000
+      low_points: 15
+      medium_threshold: 50000
+      medium_points: 10
+      high_points: 5
+
+  # Fit score categories
+  categories:
+    high_threshold: 70
+    medium_threshold: 40
+    # Below medium = LOW
+
+# Output configuration  
+output:
+  excel:
+    sheets:
+      - name: "Prospects"
+        description: "Master list with fit scores"
+      - name: "Hospitals"
+        description: "Hospital-level summary"
+      - name: "Physicians"
+        description: "Physician-level detail"
+      - name: "Open Payments"
+        description: "Device company relationships"
+      - name: "Trials"
+        description: "Clinical trial participation"
+      - name: "Sources"
+        description: "Data sources and freshness"
+        
+    formatting:
+      header_color: "4472C4"
+      high_fit_color: "92D050"
+      medium_fit_color: "FFFF00"
+      low_fit_color: "FF6B6B"
+      warm_lead_color: "00B0F0"
+      
+  json:
+    enabled: true
+    pretty_print: true
+
+# Cache configuration
+cache:
+  path: "data/cache/doctor_prospector.db"
+  
+# Logging
+logging:
+  level: "INFO"
+  file: "logs/doctor_prospector.log"

@@ -1,0 +1,36 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+.venv
+venv
+.mypy_cache
+.pytest_cache
+.ruff_cache
+*.egg-info
+
+# Node (frontend has its own build context)
+frontend/node_modules
+frontend/dist
+
+# Docker
+docker/
+.dockerignore
+
+# IDE
+.vscode
+.idea
+*.swp
+
+# Data files that are volume-mounted, not baked in
+data/cache
+data/exports
+
+# Docs
+*.md
+!README.md
+LICENSE

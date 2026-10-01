@@ -1,0 +1,182 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   Theme Definitions (Light / Dark / Grey)
+   ============================================ */
+
+:root,
+[data-theme="light"] {
+  --dg-bg-page: 249 250 251;
+  --dg-bg-surface: 255 255 255;
+  --dg-bg-inset: 243 244 246;
+  --dg-border: 229 231 235;
+  --dg-border-light: 243 244 246;
+  --dg-text: 17 24 39;
+  --dg-text-secondary: 107 114 128;
+  --dg-text-muted: 156 163 175;
+  --dg-input-bg: 255 255 255;
+  --dg-input-border: 209 213 219;
+  --dg-hover: 249 250 251;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --dg-bg-page: 3 7 18;
+  --dg-bg-surface: 17 24 39;
+  --dg-bg-inset: 31 41 55;
+  --dg-border: 55 65 81;
+  --dg-border-light: 55 65 81;
+  --dg-text: 243 244 246;
+  --dg-text-secondary: 156 163 175;
+  --dg-text-muted: 107 114 128;
+  --dg-input-bg: 31 41 55;
+  --dg-input-border: 75 85 99;
+  --dg-hover: 31 41 55;
+  color-scheme: dark;
+}
+
+[data-theme="grey"] {
+  --dg-bg-page: 209 213 219;
+  --dg-bg-surface: 229 231 235;
+  --dg-bg-inset: 209 213 219;
+  --dg-border: 156 163 175;
+  --dg-border-light: 209 213 219;
+  --dg-text: 17 24 39;
+  --dg-text-secondary: 75 85 99;
+  --dg-text-muted: 107 114 128;
+  --dg-input-bg: 243 244 246;
+  --dg-input-border: 156 163 175;
+  --dg-hover: 229 231 235;
+  color-scheme: light;
+}
+
+/* ============================================
+   Global body
+   ============================================ */
+
+body {
+  background-color: rgb(var(--dg-bg-page));
+  color: rgb(var(--dg-text));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   Theme overrides — remap Tailwind utilities
+   so all existing components theme automatically
+   ============================================ */
+
+/* --- Backgrounds --- */
+[data-theme="dark"] .bg-white,
+[data-theme="grey"] .bg-white {
+  background-color: rgb(var(--dg-bg-surface));
+}
+
+[data-theme="dark"] .bg-gray-50,
+[data-theme="grey"] .bg-gray-50 {
+  background-color: rgb(var(--dg-bg-page));
+}
+
+[data-theme="dark"] .bg-gray-100,
+[data-theme="grey"] .bg-gray-100 {
+  background-color: rgb(var(--dg-bg-inset));
+}
+
+/* --- Borders --- */
+[data-theme="dark"] .border-gray-200,
+[data-theme="dark"] .border-gray-300,
+[data-theme="grey"] .border-gray-200,
+[data-theme="grey"] .border-gray-300 {
+  border-color: rgb(var(--dg-border));
+}
+
+[data-theme="dark"] .border-gray-100,
+[data-theme="grey"] .border-gray-100 {
+  border-color: rgb(var(--dg-border-light));
+}
+
+[data-theme="dark"] .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
+[data-theme="dark"] .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+[data-theme="dark"] .divide-gray-50 > :not([hidden]) ~ :not([hidden]),
+[data-theme="grey"] .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
+[data-theme="grey"] .divide-gray-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgb(var(--dg-border));
+}
+
+/* Dashed borders (empty states) */
+[data-theme="dark"] .border-dashed {
+  border-color: rgb(var(--dg-border));
+}
+
+/* --- Text --- */
+[data-theme="dark"] .text-gray-900,
+[data-theme="dark"] .text-gray-800 {
+  color: rgb(var(--dg-text));
+}
+[data-theme="dark"] .text-gray-700 {
+  color: rgb(209 213 219);
+}
+[data-theme="dark"] .text-gray-600,
+[data-theme="dark"] .text-gray-500 {
+  color: rgb(var(--dg-text-secondary));
+}
+[data-theme="dark"] .text-gray-400 {
+  color: rgb(var(--dg-text-muted));
+}
+
+/* --- Hover --- */
+[data-theme="dark"] .hover\:bg-gray-50:hover,
+[data-theme="dark"] .hover\:bg-gray-100:hover,
+[data-theme="grey"] .hover\:bg-gray-50:hover,
+[data-theme="grey"] .hover\:bg-gray-100:hover {
+  background-color: rgb(var(--dg-hover));
+}
+
+[data-theme="dark"] .hover\:text-gray-900:hover {
+  color: rgb(var(--dg-text));
+}
+
+/* --- Inputs --- */
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea,
+[data-theme="grey"] input,
+[data-theme="grey"] select,
+[data-theme="grey"] textarea {
+  background-color: rgb(var(--dg-input-bg));
+  border-color: rgb(var(--dg-input-border));
+  color: rgb(var(--dg-text));
+}
+
+/* --- Brand color adjustments for dark --- */
+[data-theme="dark"] .bg-brand-50 {
+  background-color: rgba(37 99 235 / 0.15);
+}
+[data-theme="dark"] .text-brand-700 {
+  color: rgb(96 165 250);
+}
+[data-theme="grey"] .bg-brand-50 {
+  background-color: rgba(37 99 235 / 0.12);
+}
+
+/* --- Status badge overrides for dark --- */
+[data-theme="dark"] .bg-yellow-100 { background-color: rgba(234 179 8 / 0.2); }
+[data-theme="dark"] .text-yellow-700 { color: rgb(250 204 21); }
+[data-theme="dark"] .bg-green-100 { background-color: rgba(34 197 94 / 0.2); }
+[data-theme="dark"] .text-green-700 { color: rgb(74 222 128); }
+[data-theme="dark"] .bg-red-100,
+[data-theme="dark"] .bg-red-50 { background-color: rgba(239 68 68 / 0.15); }
+[data-theme="dark"] .text-red-700 { color: rgb(248 113 113); }
+[data-theme="dark"] .bg-blue-100 { background-color: rgba(59 130 246 / 0.2); }
+[data-theme="dark"] .text-blue-700 { color: rgb(96 165 250); }
+[data-theme="dark"] .bg-purple-100 { background-color: rgba(168 85 247 / 0.2); }
+[data-theme="dark"] .text-purple-700 { color: rgb(192 132 252); }
+[data-theme="dark"] .bg-orange-100 { background-color: rgba(249 115 22 / 0.2); }
+[data-theme="dark"] .text-orange-700 { color: rgb(251 146 60); }
+
+/* --- Scrollbar (dark mode) --- */
+[data-theme="dark"] ::-webkit-scrollbar { width: 8px; }
+[data-theme="dark"] ::-webkit-scrollbar-track { background: rgb(17 24 39); }
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background: rgb(55 65 81); border-radius: 4px; }
